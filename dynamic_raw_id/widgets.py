@@ -17,8 +17,10 @@ class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
         context = super(DynamicRawIDWidget, self).get_context(name, value, attrs)
         model = self.rel.model
         related_url = reverse(
-            "admin:{0}_{1}_changelist".format(
-                model._meta.app_label, model._meta.object_name.lower()
+            "{0}:{1}_{2}_changelist".format(
+                self.admin_site.name,
+                model._meta.app_label,
+                model._meta.object_name.lower(),
             ),
             current_app=self.admin_site.name,
         )

@@ -2,7 +2,7 @@
 Changelog
 =========
 
-v3.1 (2022-03-20)
+v3.1 (2022-12-31)
 =======================
 
 - Fix compatibility issues with multiple admin sites

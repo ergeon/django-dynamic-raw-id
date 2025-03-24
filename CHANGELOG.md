@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.5 (2025-03-24)
+
+- Merge upstream/main into main – Synchronize fork with latest upstream changes
+
 ## v4.4 (2024-11-23)
 
 - Django 5.1 compatibility and tests.

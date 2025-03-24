@@ -7,9 +7,10 @@
  */
 if (!windowname_to_id) {
   function windowname_to_id(text) {
-    text = text.replace(/__dot__/g, '.');
-    text = text.replace(/__dash__/g, '-');
-    return text;
+    return text
+      .replace(/__dot__/g, '.')
+      .replace(/__dash__/g, '-')
+      .replace(/__\d+$/, '');
   }
 }
 
@@ -89,8 +90,7 @@ function dismissRelatedLookupPopup(win, chosenId) {
         .trigger('change');
 
       $this
-        .parent()
-        .find('.dynamic_raw_id_label')
+        .closest('.dynamic_raw_id_label')
         .html('&nbsp;');
     });
 

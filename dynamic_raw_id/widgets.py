@@ -1,62 +1,45 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+from urllib.parse import urlencode
+
 from django import forms
-from django.conf import settings
 from django.contrib.admin import widgets
-from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.encoding import force_str
-from django.urls.exceptions import NoReverseMatch
 
-
-class DynamicRawIDImproperlyConfigured(ImproperlyConfigured):
-    pass
+if TYPE_CHECKING:
+    from django.forms.renderers import BaseRenderer
+    from django.template import Context
 
 
 class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
-    template_name = "dynamic_raw_id/admin/widgets/dynamic_raw_id_field.html"
+    template_name: str = "dynamic_raw_id/admin/widgets/dynamic_raw_id_field.html"
 
-    def get_context(self, name, value, attrs):
-        context = super(DynamicRawIDWidget, self).get_context(name, value, attrs)
-        model = self.rel.model
-        
-        try:
-            related_url = reverse(
-                "admin:{0}_{1}_changelist".format(
-                    model._meta.app_label, model._meta.object_name.lower()
-                ),
-                current_app=self.admin_site.name,
-            )
-        except NoReverseMatch:
-            related_url = None
+    def get_context(self, name: str, value: Any, attrs: dict[str, Any]) -> Context:
+        context = super().get_context(name, value, attrs)
+        app_name = self.rel.model._meta.app_label  # noqa: SLF001 Private member accessed
+        model_name = self.rel.model._meta.object_name.lower()  # noqa: SLF001 Private member accessed
 
-        params = self.url_parameters()
-        if params:
-            url = u"?" + u"&".join([u"{0}={1}".format(k, v) for k, v in params.items()])
-        else:
-            url = u""
-        if "class" not in attrs:
-            attrs[
-                "class"
-            ] = "vForeignKeyRawIdAdminField"  # The JavaScript looks for this hook.
-        app_name = model._meta.app_label.strip()
-        model_name = model._meta.object_name.lower().strip()
+        attrs.setdefault("class", "vForeignKeyRawIdAdminField")
 
         context.update(
-            {
-                "name": name,
-                "app_name": app_name,
-                "model_name": model_name,
-                "related_url": related_url,
-                "url": url,
-            }
+            name=name,
+            app_name=app_name,
+            model_name=model_name,
+            related_url=reverse(
+                f"admin:{app_name}_{model_name}_changelist",
+                current_app=self.admin_site.name,
+            ),
+            url=f"?{urlencode(self.url_parameters())}",
         )
         return context
 
     @property
-    def media(self):
-        extra = "" if settings.DEBUG else ".min"
+    def media(self) -> forms.Media:
         return forms.Media(
             js=[
-                "admin/js/vendor/jquery/jquery{0}.js".format(extra),
+                "admin/js/vendor/jquery/jquery.min.js",
                 "admin/js/jquery.init.js",
                 "admin/js/core.js",
                 "dynamic_raw_id/js/dynamic_raw_id.js",
@@ -65,14 +48,24 @@ class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
 
 
 class DynamicRawIDMultiIdWidget(DynamicRawIDWidget):
-    def value_from_datadict(self, data, files, name):
+    def value_from_datadict(
+        self,
+        data: dict[str, Any],
+        files: Any | None,
+        name: str,
+    ) -> str | None:
         value = data.get(name)
         if value:
-            return value.split(u",")
+            return value.split(",")
+        return None
 
-    def render(self, name, value, attrs, renderer=None):
+    def render(
+        self,
+        name: str,
+        value: Any,
+        attrs: dict[str, Any] | None = None,
+        renderer: BaseRenderer | None = None,
+    ) -> str:
         attrs["class"] = "vManyToManyRawIdAdminField"
-        value = u",".join([force_str(v) for v in value]) if value else ""
-        return super(DynamicRawIDMultiIdWidget, self).render(
-            name, value, attrs, renderer=renderer
-        )
+        value = ",".join([force_str(v) for v in value]) if value else ""
+        return super().render(name, value, attrs, renderer=renderer)

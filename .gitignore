@@ -9,3 +9,5 @@ htmlcov/
 # For your custom pyenv/tox
 .python-version
 .idea
+.poetry
+venv/

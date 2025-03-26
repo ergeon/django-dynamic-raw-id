@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.5 (2025-03-24)
+
+- Merge upstream/main into main – Synchronize fork with latest upstream changes
+- Updated package to support Python >=3.9,<3.13 and Django >=3.2,<5.2
+- Fixed Union type notation for Python 3.9 compatibility
+- Removed Python 3.8 support
+
 ## v4.4 (2024-11-23)
 
 - Django 5.1 compatibility and tests.

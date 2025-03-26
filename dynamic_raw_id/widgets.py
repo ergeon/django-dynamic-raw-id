@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional, Union, Dict, List
 from urllib.parse import urlencode
 
 from django import forms
@@ -10,13 +8,12 @@ from django.utils.encoding import force_str
 
 if TYPE_CHECKING:
     from django.forms.renderers import BaseRenderer
-    from django.template import Context
 
 
 class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
     template_name: str = "dynamic_raw_id/admin/widgets/dynamic_raw_id_field.html"
 
-    def get_context(self, name: str, value: Any, attrs: dict[str, Any]) -> Context:
+    def get_context(self, name: str, value: Any, attrs: Dict[str, Any]) -> Dict[str, Any]:
         context = super().get_context(name, value, attrs)
         app_name = self.rel.model._meta.app_label  # noqa: SLF001 Private member accessed
         model_name = self.rel.model._meta.object_name.lower()  # noqa: SLF001 Private member accessed
@@ -50,10 +47,10 @@ class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
 class DynamicRawIDMultiIdWidget(DynamicRawIDWidget):
     def value_from_datadict(
         self,
-        data: dict[str, Any],
-        files: Any | None,
+        data: Dict[str, Any],
+        files: Optional[Any],
         name: str,
-    ) -> str | None:
+    ) -> Optional[List[str]]:
         value = data.get(name)
         if value:
             return value.split(",")
@@ -63,8 +60,8 @@ class DynamicRawIDMultiIdWidget(DynamicRawIDWidget):
         self,
         name: str,
         value: Any,
-        attrs: dict[str, Any] | None = None,
-        renderer: BaseRenderer | None = None,
+        attrs: Optional[Dict[str, Any]] = None,
+        renderer: Optional['BaseRenderer'] = None,
     ) -> str:
         attrs["class"] = "vManyToManyRawIdAdminField"
         value = ",".join([force_str(v) for v in value]) if value else ""

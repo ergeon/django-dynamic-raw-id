@@ -8,13 +8,12 @@ from django.utils.encoding import force_str
 
 if TYPE_CHECKING:
     from django.forms.renderers import BaseRenderer
-    from django.template import Context
 
 
 class DynamicRawIDWidget(widgets.ForeignKeyRawIdWidget):
     template_name: str = "dynamic_raw_id/admin/widgets/dynamic_raw_id_field.html"
 
-    def get_context(self, name: str, value: Any, attrs: dict[str, Any]) -> Context:
+    def get_context(self, name: str, value: Any, attrs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
         app_name = self.rel.model._meta.app_label  # noqa: SLF001 Private member accessed
         model_name = self.rel.model._meta.object_name.lower()  # noqa: SLF001 Private member accessed

@@ -6,7 +6,7 @@ set -o pipefail
 #tox -p 4
 
 # Bump up major version number
-.poetry/bin/poetry version minor
+#.poetry/bin/poetry version minor
 VERSION="v$(.poetry/bin/poetry version -s)"
 
 # Commit new version number and create a tag and Github release

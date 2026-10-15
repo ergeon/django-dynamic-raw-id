@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.6 (2026-10-15)
+
+- Django 5.2 compatibility and tests.
+
 ## v4.5 (2025-03-24)
 
 - Merge upstream/main into main – Synchronize fork with latest upstream changes

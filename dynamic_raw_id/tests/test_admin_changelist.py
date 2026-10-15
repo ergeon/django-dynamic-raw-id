@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 import pytest
 from django.contrib.auth.models import User
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 
 from dynamic_raw_id.tests.testapp.models import (
     CharPrimaryKeyModel,
@@ -83,10 +85,19 @@ def test_changelist_filter(
     selenium.switch_to.window(selenium.window_handles[1])
 
     # Select the element matching the link text of the first test value
-    selenium.find_element(By.LINK_TEXT, str(test_value)).click()
+    WebDriverWait(selenium, 10).until(
+        expected_conditions.element_to_be_clickable((By.LINK_TEXT, str(test_value)))
+    ).click()
 
     # Activate the default window
     selenium.switch_to.window(selenium.window_handles[0])
+
+    # Picking a value reloads the changelist with the filter applied
+    WebDriverWait(selenium, 10).until(
+        expected_conditions.invisibility_of_element_located(
+            (By.LINK_TEXT, str(test_values[1]))
+        )
+    )
 
     # Only the first element will be listed on the filtered changelist
     assert selenium.find_element(By.LINK_TEXT, str(test_value)).is_displayed()

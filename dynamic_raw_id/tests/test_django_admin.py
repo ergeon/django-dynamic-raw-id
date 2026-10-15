@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 
 if TYPE_CHECKING:
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -36,7 +38,9 @@ def test_widgets(selenium: WebDriver) -> None:
         selenium.switch_to.window(selenium.window_handles[1])
 
         # Select the result element matching the link text
-        selenium.find_element(By.LINK_TEXT, select_value).click()
+        WebDriverWait(selenium, 10).until(
+            expected_conditions.element_to_be_clickable((By.LINK_TEXT, select_value))
+        ).click()
 
         # Activate the default window
         selenium.switch_to.window(selenium.window_handles[0])

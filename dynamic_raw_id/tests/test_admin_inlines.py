@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 import pytest
 from django.contrib.auth.models import User
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 
 if TYPE_CHECKING:
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -47,16 +49,19 @@ def test_widgets(selenium: WebDriver) -> None:
         selenium.switch_to.window(selenium.window_handles[1])
 
         # Select the result element matching the link text
-        selenium.find_element(By.LINK_TEXT, test_value).click()
+        WebDriverWait(selenium, 10).until(
+            expected_conditions.element_to_be_clickable((By.LINK_TEXT, test_value))
+        ).click()
 
         # Activate the default window
         selenium.switch_to.window(selenium.window_handles[0])
 
-        # Find the attached label next to it, and draw a red border around it
-        label = selenium.find_element(
+        # The label next to the field is filled in by an ajax call
+        label = (
             By.ID,
             f"modeltotestinlines_set-{uid}-dynamic_raw_id_fk_dynamic_raw_id_label",
         )
-
-        # Test that the displayed value matches the test value
-        assert label.text == test_value
+        WebDriverWait(selenium, 10).until(
+            expected_conditions.text_to_be_present_in_element(label, test_value)
+        )
+        assert selenium.find_element(*label).text == test_value

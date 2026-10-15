@@ -4,7 +4,7 @@
 
 - Django 5.2 compatibility and tests.
 - Require Python 3.12+ (drop 3.9, 3.10, 3.11).
-- Require Django 4.2+ (drop 3.2, 4.0, 4.1).
+- Require Django 5.2+.
 
 ## v4.5 (2025-03-24)
 
